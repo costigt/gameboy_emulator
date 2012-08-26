@@ -60,7 +60,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Cpu.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Mmu.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Cpu.h" />
+    <ClInclude Include="Mmu.h" />
+    <ClInclude Include="RegisterFile.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
