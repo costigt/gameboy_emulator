@@ -66,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cpu.h" />
+    <ClInclude Include="DataTypes.h" />
     <ClInclude Include="Mmu.h" />
     <ClInclude Include="RegisterFile.h" />
   </ItemGroup>

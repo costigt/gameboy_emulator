@@ -1,12 +1,17 @@
-﻿Build started 20/08/2012 11:39:14.
+﻿Build started 28/08/2012 19:19:47.
      1>Project "C:\Users\Timothy\Documents\GitHub\gameboy_emulator\GBC_Emulator\GBC_Emulator\GBC_Emulator.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\GBC_Emulator.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
-         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
-         main.cpp
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt Mmu.cpp
+         Mmu.cpp
+     1>c:\users\timothy\documents\github\gameboy_emulator\gbc_emulator\gbc_emulator\mmu.cpp(65): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
+     1>c:\users\timothy\documents\github\gameboy_emulator\gbc_emulator\gbc_emulator\mmu.cpp(123): warning C4554: '&' : check operator precedence for possible error; use parentheses to clarify precedence
        Link:
-         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Timothy\Documents\GitHub\gameboy_emulator\GBC_Emulator\Debug\GBC_Emulator.exe" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\GBC_Emulator.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\Timothy\Documents\GitHub\gameboy_emulator\GBC_Emulator\Debug\GBC_Emulator.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Timothy\Documents\GitHub\gameboy_emulator\GBC_Emulator\Debug\GBC_Emulator.lib" /MACHINE:X86 Debug\main.obj
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Timothy\Documents\GitHub\gameboy_emulator\GBC_Emulator\Debug\GBC_Emulator.exe" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\GBC_Emulator.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\Timothy\Documents\GitHub\gameboy_emulator\GBC_Emulator\Debug\GBC_Emulator.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Timothy\Documents\GitHub\gameboy_emulator\GBC_Emulator\Debug\GBC_Emulator.lib" /MACHINE:X86 Debug\Cpu.obj
+         Debug\main.obj
+         Debug\Mmu.obj
          LINK : C:\Users\Timothy\Documents\GitHub\gameboy_emulator\GBC_Emulator\Debug\GBC_Emulator.exe not found or not built by the last incremental link; performing full link
          GBC_Emulator.vcxproj -> C:\Users\Timothy\Documents\GitHub\gameboy_emulator\GBC_Emulator\Debug\GBC_Emulator.exe
        Manifest:
@@ -18,4 +23,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:01.25
+Time Elapsed 00:00:01.01
