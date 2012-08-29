@@ -11,7 +11,7 @@ namespace gameboy
 #define CGB_VRAM_BANK 8192
 #define CGB_WRAM_BANK 4096
 #define CGB_ERAM_BANK 8192
-	enum BinaryType {BIOS,ROM};
+	enum BinaryType {BIOS,ROM,SAVE};
 	class MMU
 	{
 	public:
@@ -20,15 +20,13 @@ namespace gameboy
 		void loadProgram(const char *filename);
 		void write(WORD address, BYTE value);
 		BYTE read(WORD address);
-		void reset();
 		void setBiosEnabled(bool value);
 		bool getBiosEnabled();
 	private:
 		void loadBinary(const char *filename,BinaryType type);
-		void initialiseAfterBios();
 		bool m_CGBFlag,m_BiosEnable,m_RomMode,m_RamEnable;
 		BYTE m_Title[16],m_CartType,m_RomSize,m_RamSize,m_RTC,m_RomBank,m_ERamBank,m_WRamBank;
-		BYTE *m_Rom,*m_Bios;
+		BYTE *m_Rom,*m_Bios,*m_Eram;
 		BYTE m_Vram[CGB_VRAM],m_Wram[CGB_WRAM],m_Oam[CGB_OAM],m_IO[CGB_IO],m_ZeroPage[CGB_ZPAGE],m_IEF;
 	};
 }

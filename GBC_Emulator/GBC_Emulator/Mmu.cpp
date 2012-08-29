@@ -4,6 +4,8 @@
 #include <iostream>
 #include <assert.h>
 
+#define DEBUG_OUTPUT
+
 namespace gameboy
 {
 	MMU::MMU()
@@ -99,13 +101,25 @@ namespace gameboy
 				m_Bios[i] = buffer[i];
 			}
 		}
-		else
+		else if(type == ROM)
 		{
 			//load program into memory
 			m_Rom = new BYTE[lSize];
 			for(int i = 0 ; i < lSize ; ++i)
 			{
 				m_Rom[i] = buffer[i];
+			}
+		}
+		else
+		{
+			//load save into memory
+			if(m_Eram==NULL)
+			{
+				m_Eram = new BYTE[lSize];
+			}
+			for(int i = 0 ; i < lSize ; ++i)
+			{
+				m_Eram[i] = buffer[i];
 			}
 		}
 
@@ -118,7 +132,10 @@ namespace gameboy
 		{
 			//RAM bank enable
 		case 0x0000:case 0x1000:
-			m_RamEnable = (value & 0x000F == 0xA)?true:false;
+			m_RamEnable = ((value & 0x000F) == 0xA)?true:false;
+			#ifdef DEBUG_OUTPUT
+				printf("RamEnable: %s",(m_RamEnable)?"true":"false");
+			#endif
 			break;
 			//ROM bank number
 		case 0x2000:case 0x3000:
@@ -135,6 +152,9 @@ namespace gameboy
 				//set lower 5 bits
 				m_RomBank |= value & 0x1F;
 			}
+			#ifdef DEBUG_OUTPUT
+				printf("Rombank: %x",m_RomBank);
+			#endif
 			break;
 			//RAM bank number or Upper bits of ROM bank number
 		case 0x4000:case 0x5000:
@@ -145,42 +165,75 @@ namespace gameboy
 				m_RomBank &= 0x9F;
 				//set bit 5 and 6
 				m_RomBank |= (value && 0x03) << 5;
+				//you cannot address 0x20, 0x40 or 0x50 according to pandocs
+				//any attempt to do so will result in the next next bank being addressed
+				if(m_RomBank == 0x20 || m_RomBank == 0x40 || m_RomBank == 0x50)
+				{
+					m_RomBank++;
+				}
+				#ifdef DEBUG_OUTPUT
+					printf("RomBank: %x",m_RomBank);
+				#endif
 			}
 			else
 			{
 				m_ERamBank = value;
+				#ifdef DEBUG_OUTPUT
+					printf("EramBank: %x",m_ERamBank);
+				#endif
 			}
 			break;
 			//ROM/RAM Mode Select
 		case 0x6000:case 0x7000:
 			m_RomMode = (value==00)? true:false;
+			#ifdef DEBUG_OUTPUT
+				printf("RomMode: %s",(m_RomMode)?"true":"false");
+			#endif
 			break;
 			//VRAM
 		case 0x8000:case 0x9000:
 			m_Vram[(address-0x8000) + CGB_VRAM_BANK*m_IO[0x4F]] = value;
+			#ifdef DEBUG_OUTPUT
+				printf("Vram");
+			#endif
 			break;
 			//ERAM
 		case 0xA000:case 0xB000:
-			if(m_RomMode)
+			if(m_RamEnable && m_Eram != NULL)
 			{
-
+				if(m_RomMode)
+				{
+					m_Eram[address-0xA000] = value;
+				}
+				else
+				{
+					m_Eram[(address-0xA000) + CGB_ERAM_BANK*m_ERamBank] = value;
+				}
 			}
-			else
-			{
-
-			}
+			#ifdef DEBUG_OUTPUT
+				printf("Eram");
+			#endif
 			break;
 			//WRAM bank 0
 		case 0xC000:
 			m_Wram[address-0xC000] = value;
+			#ifdef DEBUG_OUTPUT
+				printf("WRAM bank 0");
+			#endif
 			break;
 			//WRAM bank 1-7
 		case 0xD000:
 			m_Wram[(address-0xC000) + CGB_WRAM_BANK*m_WRamBank] = value;
+			#ifdef DEBUG_OUTPUT
+				printf("WRAM bank 1-7");
+			#endif
 			break;
 			//ECHO Ram
 		case 0xE000:
 			m_Wram[address-0xE000] = value;
+			#ifdef DEBUG_OUTPUT
+				printf("ECHO ram");
+			#endif
 			break;
 			//Upper ECHO ram,OAM,Hardware Registers,Zero page,IEF
 		case 0xF000:
@@ -191,10 +244,27 @@ namespace gameboy
 			case 0x500:case 0x600:case 0x700:case 0x800:case 0x900:
 			case 0xA00:case 0xB00:case 0xC00:case 0xD00:
 				m_Wram[address-0xE000] = value;
+				#ifdef DEBUG_OUTPUT
+					printf("ECHO ram");
+				#endif
 				break;
 				//OAM
 			case 0xE00:
-				m_Oam[address-0xFE00] = value;
+				switch(address & 0x00F0)
+				{
+				case 0x00:case 0x10:case 0x20:case 0x30:case 0x40:case 0x50:
+				case 0x60:case 0x70:case 0x80:case 0x90:
+					m_Oam[address-0xFE00] = value;
+					#ifdef DEBUG_OUTPUT
+						printf("OAM");
+					#endif
+					break;
+				case 0xA0:case 0xB0:case 0xC0:case 0xD0:case 0xE0:case 0xF0:
+					#ifdef DEBUG_OUTPUT
+						printf("Unusable Memory");
+					#endif
+					break;
+				}
 				break;
 				//Hardware Registers,Zero page, IEF
 			case 0xF00:
@@ -204,11 +274,17 @@ namespace gameboy
 				case 0x00:case 0x10:case 0x20:case 0x30:case 0x40:case 0x50:
 				case 0x60:case 0x70:
 					m_IO[address-0xFF00] = value;
+					#ifdef DEBUG_OUTPUT
+						printf("Hardware Registers");
+					#endif
 					break;
 					//Zero Page
 				case 0x80:case 0x90:case 0xA0:case 0xB0:case 0xC0:case 0xD0:
 				case 0xE0:
 					m_ZeroPage[address-0xFF80] = value;
+					#ifdef DEBUG_OUTPUT
+						printf("ZERO PAGE");
+					#endif
 					break;
 				//Zero Page, IEF
 				case 0xF0:
@@ -218,9 +294,15 @@ namespace gameboy
 					case 0x6:case 0x7:case 0x8:case 0x9:case 0xA:case 0xB:
 					case 0xC:case 0xD:case 0xE:
 						m_ZeroPage[address-0xFF80] = value;
+						#ifdef DEBUG_OUTPUT
+							printf("ZERO PAGE");
+						#endif
 						break;
 					case 0xF:
 						m_IEF = value;
+						#ifdef DEBUG_OUTPUT
+							printf("IEF");
+						#endif
 						break;
 					}
 				}
@@ -257,13 +339,16 @@ namespace gameboy
 			return m_Vram[(address-0x8000) + CGB_VRAM_BANK*m_IO[0x4F]];
 			//ERAM
 		case 0xA000:case 0xB000:
-			if(m_RomMode)
+			if(m_RamEnable && m_Eram !=NULL)
 			{
-
-			}
-			else
-			{
-
+				if(m_RomMode)
+				{
+					return m_Eram[address-0xA000];
+				}
+				else
+				{
+					return m_Eram[(address-0xA000) + CGB_ERAM_BANK*m_ERamBank];
+				}
 			}
 			return 0x0000;
 			//WRAM bank 0
@@ -286,7 +371,17 @@ namespace gameboy
 				return m_Wram[address-0xE000];
 				//OAM
 			case 0xE00:
-				return m_Oam[address-0xFE00];
+				switch(address & 0x00F0)
+				{
+				case 0x00:case 0x10:case 0x20:case 0x30:case 0x40:case 0x50:
+				case 0x60:case 0x70:case 0x80:case 0x90:
+					return m_Oam[address-0xFE00];
+					break;
+				case 0xA0:case 0xB0:case 0xC0:case 0xD0:case 0xE0:case 0xF0:
+					return 0x0000;
+					break;
+				}
+				break;
 				//Hardware Registers,Zero page, IEF
 			case 0xF00:
 				switch(address & 0x00F0)
@@ -317,23 +412,13 @@ namespace gameboy
 		}
 	}
 
-	void MMU::reset()
-	{
-
-	}
-
 	void MMU::setBiosEnabled(bool value)
 	{
-
+		m_BiosEnable = value;
 	}
 
 	bool MMU::getBiosEnabled()
 	{
 		return m_BiosEnable;
-	}
-
-	void MMU::initialiseAfterBios()
-	{
-
 	}
 }
